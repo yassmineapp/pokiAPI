@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex - Responsive & Pagination</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #899ec9;
+            margin: 0;
+            text-align: center;
+        }
+
+        .search_bar {
+            margin: 20px auto;
+        }
+
+        .search_bar input {
+            width: 90%;
+            max-width: 400px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #b4a982;
+            border-radius: 30px;
+            outline: none;
+            text-align: center;
+        }
+
+        .pokemon-details {
+            background: rgb(217, 169, 98);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .pokemon-details img {
+            width: 150px;
+        }
+
+        .type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin: 3px;
+            color: rgb(13, 13, 12);
+            font-size: 14px;
+        }
+
+        .type.fire { background: #de3b09; }
+        .type.grass { background: #419a44; }
+        .type.water { background: #1c7cca; }
+        .type.poison { background: #9c27b0; }
+        .type.flying { background: #03a9f4; }
+
+        .pokemon-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+
+        .pokemon-card {
+            background: rgb(215, 195, 174);
+            border-radius: 15px;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pokemon-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        .pokemon-card:hover {
+            transform: scale(1.05);
+        }
+
+        .pagination {
+            margin: 20px auto;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #2196f3;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #1976d2;
+        }
+
+        @media (max-width: 600px) {
+            .pokemon-list {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="search_bar">
+    <input type="text" id="searchInput" placeholder="Search Pokémon..." oninput="filterPokemon()">
+</div>
+
+<div id="pokemon-details" class="pokemon-details">
+    <p>Select a Pokémon to display details here.</p>
+</div>
+
+<div id="pokemon-list" class="pokemon-list"></div>
+
+<div class="pagination">
+    <button onclick="changePage(-1)">Previous</button>
+    <button onclick="changePage(1)">Next</button>
+</div>
+
+<script>
+    const pokemonList = document.getElementById('pokemon-list');
+    const pokemonDetails = document.getElementById('pokemon-details');
+    const searchInput = document.getElementById('searchInput');
+
+    let allPokemons = [];
+    let currentPage = 1;
+    const perPage = 20;
+
+    async function fetchAllPokemon() {
+        const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=200');
+        const data = await response.json();
+        const promises = data.results.map(p => fetch(p.url).then(res => res.json()));
+        allPokemons = await Promise.all(promises);
+        displayAll();
+    }
+
+    function displayAll() {
+        pokemonList.innerHTML = '';
+        const start = (currentPage - 1) * perPage;
+        const end = start + perPage;
+        allPokemons.slice(start, end).forEach(displayPokemon);
+    }
+
+    function displayPokemon(details) {
+        const card = document.createElement('div');
+        card.className = 'pokemon-card';
+        const imageUrl = details.sprites.other['official-artwork'].front_default || details.sprites.front_default;
+        card.innerHTML = `
+            <img src="${imageUrl}" alt="${details.name}">
+            <h3>${details.name}</h3>
+        `;
+        card.onclick = () => showDetails(details);
+        pokemonList.appendChild(card);
+    }
+
+    function filterPokemon() {
+        const value = searchInput.value.toLowerCase();
+        const filtered = allPokemons.filter(p => p.name.includes(value));
+        pokemonList.innerHTML = '';
+        filtered.forEach(displayPokemon);
+    }
+
+    function showDetails(details) {
+        const imageUrl = details.sprites.other['official-artwork'].front_default || details.sprites.front_default;
+        pokemonDetails.innerHTML = `
+            <img src="${imageUrl}" alt="${details.name}">
+            <h2>${details.name.toUpperCase()}</h2>
+            <p><strong>ID:</strong> #${details.id}</p>
+            <div>
+                ${details.types.map(t => `<span class="type ${t.type.name}">${t.type.name}</span>`).join('')}
+            </div>
+            <p><strong>Height:</strong> ${details.height / 10} m</p>
+            <p><strong>Weight:</strong> ${details.weight / 10} kg</p>
+            <p><strong>Base Experience:</strong> ${details.base_experience}</p>
+        `;
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(allPokemons.length / perPage);
+        currentPage += direction;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        displayAll();
+    }
+
+    fetchAllPokemon();
+</script>
+
+</body>
+</html>

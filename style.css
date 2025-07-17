@@ -1,0 +1,102 @@
+* {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f6f8fc;
+            margin: 0;
+            text-align: center;
+        }
+
+        .search_bar {
+            margin: 20px auto;
+        }
+
+        .search_bar input {
+            width: 90%;
+            max-width: 400px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            text-align: center;
+        }
+
+        .pokemon-details {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .pokemon-details img {
+            width: 150px;
+        }
+
+        .type {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin: 3px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .type.fire { background: #ff5722; }
+        .type.grass { background: #4caf50; }
+        .type.water { background: #2196f3; }
+        .type.poison { background: #9c27b0; }
+        .type.flying { background: #03a9f4; }
+
+        .pokemon-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+        }
+
+        .pokemon-card {
+            background: white;
+            border-radius: 15px;
+            text-align: center;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pokemon-card:hover {
+            transform: scale(1.05);
+        }
+
+        .pagination {
+            margin: 20px auto;
+        }
+
+        .pagination button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #2196f3;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #1976d2;
+        }
+
+        @media (max-width: 600px) {
+            .search_bar input {
+                width: 90%;
+            }
+        }
